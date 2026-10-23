@@ -25,7 +25,7 @@ it keeps working offline and can be added to a phone's home screen.
 | --- | --- |
 | Home | Live counts from the bank, subject cards, and a recap of recent papers |
 | Practice | One question at a time, filters by subject, search across prompts, explanation on reveal, keyboard shortcuts (A–D / 1–4, ← →) |
-| Timed paper | Random draw from the subjects you tick, countdown clock, question palette, flag-for-review, auto-submit at zero, results with a per-subject breakdown and a full review |
+| Timed paper | English compulsory plus one to three other subjects (two to four total), custom time limit up to two hours, countdown clock, question palette, flag-for-review, auto-end at zero, results with a per-subject breakdown and a full review only after the exam ends |
 | Progress | Papers sat, overall accuracy, best paper, accuracy by subject, paper log |
 | Import | Paste or upload JSON to extend the bank |
 

@@ -33,7 +33,7 @@ export function Home({ questions, sessions, onPickSubject, onStartExam, onOpenPr
             <h1 className="hero-title">Sit the exam before the exam.</h1>
             <p className="lede">
               A quiet room with a running clock. Work the bank topic by topic, or take a timed paper with no
-              explanations until you submit — then read why every answer is right.
+              explanations until you end it — then read why every answer is right.
             </p>
             <div className="hero-actions">
               <button type="button" className="btn btn-primary" onClick={onStartExam}>
@@ -133,12 +133,12 @@ export function Home({ questions, sessions, onPickSubject, onStartExam, onOpenPr
               <p className="mode-kicker">Timed</p>
               <h3>Papers under a clock</h3>
               <p>
-                Mix subjects, choose a length, and the clock starts. Answers stay hidden until you submit, but you can
-                flag a question and come back to it.
+                English is compulsory; add one to three other subjects and set your own time, up to two hours. Answers
+                stay hidden until you end the exam, but you can flag a question and come back to it.
               </p>
               <ul className="mode-list">
                 <li>Question palette with flagged items</li>
-                <li>Auto-submits when time runs out</li>
+                <li>Ends automatically when time runs out</li>
                 <li>Score breakdown by subject afterward</li>
               </ul>
               <button type="button" className="btn btn-outline" onClick={onStartExam}>

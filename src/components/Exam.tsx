@@ -13,7 +13,44 @@ interface Outcome extends SessionRecord {
 }
 
 const COUNT_CHOICES = [10, 20, 40, 60];
-const MINUTE_CHOICES = [10, 20, 30, 45];
+const MIN_SUBJECTS = 2;
+const MAX_SUBJECTS = 4;
+const MAX_MINUTES = 120;
+
+function clampMinutes(raw: string): number {
+  if (!raw.trim()) return MAX_MINUTES;
+  const value = Math.round(Number(raw));
+  if (!Number.isFinite(value) || value < 1) return 1;
+  return Math.min(MAX_MINUTES, value);
+}
+
+function drawPaper(pool: Question[], subjectIds: SubjectId[], count: number): Question[] {
+  const target = Math.min(count, pool.length);
+  if (target === 0) return [];
+
+  const buckets = subjectIds
+    .map((id) => ({ id, items: shuffle(pool.filter((question) => question.subject === id)) }))
+    .filter((bucket) => bucket.items.length > 0);
+  if (buckets.length === 0) return [];
+
+  const base = Math.floor(target / buckets.length);
+  let extra = target - base * buckets.length;
+  const picked: Question[] = [];
+
+  for (const bucket of shuffle(buckets)) {
+    const quota = base + (extra > 0 ? 1 : 0);
+    if (extra > 0) extra -= 1;
+    picked.push(...bucket.items.slice(0, Math.min(quota, bucket.items.length)));
+  }
+
+  if (picked.length < target) {
+    const used = new Set(picked.map((question) => question.id));
+    const rest = shuffle(pool.filter((question) => !used.has(question.id)));
+    picked.push(...rest.slice(0, target - picked.length));
+  }
+
+  return shuffle(picked);
+}
 
 interface ExamProps {
   questions: Question[];
@@ -22,9 +59,10 @@ interface ExamProps {
 
 export function Exam({ questions, onSession }: ExamProps) {
   const [phase, setPhase] = useState<Phase>('setup');
-  const [subjectIds, setSubjectIds] = useState<SubjectId[]>(() => SUBJECTS.map((subject) => subject.id));
+  const [subjectIds, setSubjectIds] = useState<SubjectId[]>(['english']);
   const [count, setCount] = useState(20);
-  const [minutes, setMinutes] = useState(20);
+  const [minutesDraft, setMinutesDraft] = useState(String(MAX_MINUTES));
+  const minutes = clampMinutes(minutesDraft);
 
   const [paper, setPaper] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, OptionKey>>({});
@@ -41,13 +79,21 @@ export function Exam({ questions, onSession }: ExamProps) {
     [questions, subjectIds],
   );
   const paperSize = Math.min(count, pool.length);
+  const englishAvailable = questions.filter((question) => question.subject === 'english').length;
+  const atSubjectLimit = subjectIds.length >= MAX_SUBJECTS;
+  const canStart =
+    pool.length > 0 &&
+    subjectIds.length >= MIN_SUBJECTS &&
+    subjectIds.includes('english') &&
+    englishAvailable > 0;
   const current = paper[index];
   const answeredCount = paper.reduce((total, question) => total + (answers[question.id] ? 1 : 0), 0);
 
   const start = useCallback(() => {
-    if (pool.length === 0) return;
+    if (pool.length === 0 || subjectIds.length < MIN_SUBJECTS || !subjectIds.includes('english')) return;
     finished.current = false;
-    setPaper(shuffle(pool).slice(0, Math.min(count, pool.length)));
+    setMinutesDraft(String(minutes));
+    setPaper(drawPaper(pool, subjectIds, count));
     setAnswers({});
     setFlags([]);
     setIndex(0);
@@ -55,7 +101,7 @@ export function Exam({ questions, onSession }: ExamProps) {
     setRemaining(minutes * 60);
     setDeadline(Date.now() + minutes * 60 * 1000);
     setPhase('running');
-  }, [count, minutes, pool]);
+  }, [count, minutes, pool, subjectIds]);
 
   const finish = useCallback(
     (timedOut: boolean) => {
@@ -106,7 +152,12 @@ export function Exam({ questions, onSession }: ExamProps) {
   }, [phase, deadline, remaining, finish]);
 
   const toggleSubject = (id: SubjectId) => {
-    setSubjectIds((value) => (value.includes(id) ? value.filter((item) => item !== id) : [...value, id]));
+    if (id === 'english') return;
+    setSubjectIds((value) => {
+      if (value.includes(id)) return value.filter((item) => item !== id);
+      if (value.length >= MAX_SUBJECTS) return value;
+      return [...value, id];
+    });
   };
 
   const choose = (key: OptionKey) => {
@@ -123,7 +174,8 @@ export function Exam({ questions, onSession }: ExamProps) {
             <p className="eyebrow">Timed paper</p>
             <h1 className="page-title">Set the paper before the clock</h1>
             <p className="page-note">
-              Questions are drawn at random from the subjects you tick. Nothing is revealed until you submit.
+              English is compulsory. Pick one to three other subjects (two to four in total). Questions are drawn
+              at random, and nothing is revealed until you end the paper or time runs out.
             </p>
           </header>
 
@@ -134,21 +186,35 @@ export function Exam({ questions, onSession }: ExamProps) {
                 {SUBJECTS.map((subject) => {
                   const available = questions.filter((question) => question.subject === subject.id).length;
                   const active = subjectIds.includes(subject.id);
+                  const locked = subject.id === 'english';
+                  const blocked = available === 0 || (locked && available > 0) || (!active && atSubjectLimit);
                   return (
                     <button
                       key={subject.id}
                       type="button"
-                      className={`chip ${active ? 'is-active' : ''}`}
+                      className={`chip ${active ? 'is-active' : ''} ${locked && available > 0 ? 'is-locked' : ''}`}
                       aria-pressed={active}
-                      disabled={available === 0}
+                      aria-disabled={locked || undefined}
+                      disabled={blocked}
                       onClick={() => toggleSubject(subject.id)}
                     >
                       {subject.short} <span className="chip-count">{available}</span>
+                      {locked ? <span className="chip-lock">Required</span> : null}
                     </button>
                   );
                 })}
               </div>
-              {subjectIds.length === 0 ? <p className="hint hint-warn">Tick at least one subject.</p> : null}
+              {subjectIds.length < MIN_SUBJECTS ? (
+                <p className="hint hint-warn">
+                  English is compulsory — pick at least one more subject. Minimum is two subjects.
+                </p>
+              ) : null}
+              {atSubjectLimit ? (
+                <p className="hint">Maximum of four subjects including English. Untick one to swap.</p>
+              ) : null}
+              {englishAvailable === 0 ? (
+                <p className="hint hint-bad">No English questions are loaded. Import the English paper before starting.</p>
+              ) : null}
             </fieldset>
 
             <fieldset className="fieldset">
@@ -174,31 +240,37 @@ export function Exam({ questions, onSession }: ExamProps) {
             </fieldset>
 
             <fieldset className="fieldset">
-              <legend className="legend">Minutes</legend>
-              <div className="segmented">
-                {MINUTE_CHOICES.map((choice) => (
-                  <button
-                    key={choice}
-                    type="button"
-                    className={`segment ${minutes === choice ? 'is-active' : ''}`}
-                    aria-pressed={minutes === choice}
-                    onClick={() => setMinutes(choice)}
-                  >
-                    {choice}
-                  </button>
-                ))}
+              <legend className="legend">Time limit</legend>
+              <div className="duration-field">
+                <input
+                  id="exam-minutes"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="off"
+                  value={minutesDraft}
+                  onChange={(event) => {
+                    const digits = event.target.value.replace(/\D/g, '').slice(0, 3);
+                    setMinutesDraft(digits === '' ? '' : String(Math.min(MAX_MINUTES, Number(digits))));
+                  }}
+                  onBlur={() => setMinutesDraft(String(minutes))}
+                  aria-describedby="exam-minutes-hint"
+                />
+                <span className="duration-unit">minutes</span>
+                <span className="duration-max">max {MAX_MINUTES}</span>
               </div>
-              <p className="hint">
+              <p className="hint" id="exam-minutes-hint">
+                Set any duration up to two hours.{' '}
                 {paperSize > 0 ? `${Math.round((minutes * 60) / paperSize)} seconds per question.` : '—'}
               </p>
             </fieldset>
 
             <div className="setup-foot">
-              <button type="button" className="btn btn-primary" onClick={start} disabled={pool.length === 0}>
+              <button type="button" className="btn btn-primary" onClick={start} disabled={!canStart}>
                 Start the clock
               </button>
               <p className="setup-meta">
-                {subjectIds.length} of {SUBJECTS.length} subjects · {plural(paperSize, 'question')} · {minutes} minutes
+                {subjectIds.length} subjects · {plural(paperSize, 'question')} · {minutes} minutes
               </p>
             </div>
           </div>
@@ -215,7 +287,7 @@ export function Exam({ questions, onSession }: ExamProps) {
       <section className="section">
         <div className="wrap">
           <header className="page-head page-head-stack">
-            <p className="eyebrow">{outcome.timedOut ? 'Time ran out' : 'Submitted'}</p>
+            <p className="eyebrow">{outcome.timedOut ? 'Time ran out' : 'Exam ended'}</p>
             <h1 className="page-title">Result</h1>
           </header>
 
@@ -349,7 +421,7 @@ export function Exam({ questions, onSession }: ExamProps) {
             {answeredCount} of {paper.length} answered
           </p>
           <button type="button" className="btn btn-primary btn-sm" onClick={() => setConfirmOpen(true)}>
-            Submit paper
+            End exam
           </button>
         </div>
         <div className="wrap">
@@ -431,15 +503,15 @@ export function Exam({ questions, onSession }: ExamProps) {
 
       <Modal
         open={confirmOpen}
-        title="Submit this paper?"
-        confirmLabel="Submit"
+        title="End this exam?"
+        confirmLabel="End exam"
         onConfirm={() => finish(false)}
         onClose={() => setConfirmOpen(false)}
       >
         <p>
           {paper.length - answeredCount === 0
-            ? 'Every question has an answer.'
-            : `${plural(paper.length - answeredCount, 'question')} left unanswered. Blank answers score zero.`}
+            ? 'Every question has an answer. You will see your score and the explanations next.'
+            : `${plural(paper.length - answeredCount, 'question')} left unanswered. Blank answers score zero. You will see your score next.`}
         </p>
       </Modal>
     </section>

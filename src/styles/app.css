@@ -373,6 +373,62 @@ select {
   cursor: not-allowed;
 }
 
+.chip.is-locked:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.chip-lock {
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.duration-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.duration-field input {
+  width: 84px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  color: var(--ink);
+}
+
+.duration-field input:hover {
+  border-color: var(--line-strong);
+}
+
+.duration-field input:focus-visible {
+  outline: 2px solid var(--green-deep);
+  outline-offset: 2px;
+}
+
+.duration-unit {
+  font-size: 0.8125rem;
+  color: var(--ink-mid);
+}
+
+.duration-max {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
 .segmented {
   display: inline-flex;
   justify-self: start;
