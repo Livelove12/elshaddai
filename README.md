@@ -5,6 +5,9 @@ explanations, and timed papers with a palette, flags and a score breakdown.
 Everything runs in the browser and stores its data in `localStorage` — no
 account, no server, no upload.
 
+**Live:** https://livelove12.github.io/elshaddai/ — installable, works offline
+after the first visit.
+
 ```bash
 npm install
 npm run dev      # http://localhost:5173
