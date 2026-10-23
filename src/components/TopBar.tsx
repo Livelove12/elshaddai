@@ -51,13 +51,6 @@ export function TopBar({ view, onNavigate }: TopBarProps) {
 
           <nav className="topnav" aria-label="Primary">
             {NAV.map((item) => link(item))}
-            <button
-              type="button"
-              className="btn btn-primary btn-sm topnav-cta"
-              onClick={() => onNavigate('exam')}
-            >
-              Sit a paper
-            </button>
           </nav>
 
           <p className="topbar-meta">

@@ -203,10 +203,6 @@ select {
   background: var(--green);
 }
 
-.topnav-cta {
-  margin-left: var(--space-3);
-}
-
 .topbar-meta {
   display: flex;
   align-items: center;
