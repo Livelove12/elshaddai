@@ -12,10 +12,15 @@ interface Outcome extends SessionRecord {
   timedOut: boolean;
 }
 
-const COUNT_CHOICES = [10, 20, 40, 60];
+const ENGLISH_QUESTIONS = 60;
+const OTHER_QUESTIONS = 40;
 const MIN_SUBJECTS = 2;
 const MAX_SUBJECTS = 4;
 const MAX_MINUTES = 120;
+
+function quotaFor(id: SubjectId): number {
+  return id === 'english' ? ENGLISH_QUESTIONS : OTHER_QUESTIONS;
+}
 
 function clampMinutes(raw: string): number {
   if (!raw.trim()) return MAX_MINUTES;
@@ -24,29 +29,12 @@ function clampMinutes(raw: string): number {
   return Math.min(MAX_MINUTES, value);
 }
 
-function drawPaper(pool: Question[], subjectIds: SubjectId[], count: number): Question[] {
-  const target = Math.min(count, pool.length);
-  if (target === 0) return [];
-
-  const buckets = subjectIds
-    .map((id) => ({ id, items: shuffle(pool.filter((question) => question.subject === id)) }))
-    .filter((bucket) => bucket.items.length > 0);
-  if (buckets.length === 0) return [];
-
-  const base = Math.floor(target / buckets.length);
-  let extra = target - base * buckets.length;
+function drawPaper(pool: Question[], subjectIds: SubjectId[]): Question[] {
   const picked: Question[] = [];
 
-  for (const bucket of shuffle(buckets)) {
-    const quota = base + (extra > 0 ? 1 : 0);
-    if (extra > 0) extra -= 1;
-    picked.push(...bucket.items.slice(0, Math.min(quota, bucket.items.length)));
-  }
-
-  if (picked.length < target) {
-    const used = new Set(picked.map((question) => question.id));
-    const rest = shuffle(pool.filter((question) => !used.has(question.id)));
-    picked.push(...rest.slice(0, target - picked.length));
+  for (const id of subjectIds) {
+    const items = shuffle(pool.filter((question) => question.subject === id));
+    picked.push(...items.slice(0, Math.min(quotaFor(id), items.length)));
   }
 
   return shuffle(picked);
@@ -60,7 +48,6 @@ interface ExamProps {
 export function Exam({ questions, onSession }: ExamProps) {
   const [phase, setPhase] = useState<Phase>('setup');
   const [subjectIds, setSubjectIds] = useState<SubjectId[]>(['english']);
-  const [count, setCount] = useState(20);
   const [minutesDraft, setMinutesDraft] = useState(String(MAX_MINUTES));
   const minutes = clampMinutes(minutesDraft);
 
@@ -78,8 +65,17 @@ export function Exam({ questions, onSession }: ExamProps) {
     () => questions.filter((question) => subjectIds.includes(question.subject)),
     [questions, subjectIds],
   );
-  const paperSize = Math.min(count, pool.length);
-  const englishAvailable = questions.filter((question) => question.subject === 'english').length;
+  const counts = useMemo(() => {
+    const map = new Map<SubjectId, number>();
+    for (const question of questions) map.set(question.subject, (map.get(question.subject) ?? 0) + 1);
+    return map;
+  }, [questions]);
+  const paperSize = subjectIds.reduce(
+    (total, id) => total + Math.min(quotaFor(id), counts.get(id) ?? 0),
+    0,
+  );
+  const fullPaperSize = ENGLISH_QUESTIONS + Math.max(0, subjectIds.length - 1) * OTHER_QUESTIONS;
+  const englishAvailable = counts.get('english') ?? 0;
   const atSubjectLimit = subjectIds.length >= MAX_SUBJECTS;
   const canStart =
     pool.length > 0 &&
@@ -93,7 +89,7 @@ export function Exam({ questions, onSession }: ExamProps) {
     if (pool.length === 0 || subjectIds.length < MIN_SUBJECTS || !subjectIds.includes('english')) return;
     finished.current = false;
     setMinutesDraft(String(minutes));
-    setPaper(drawPaper(pool, subjectIds, count));
+    setPaper(drawPaper(pool, subjectIds));
     setAnswers({});
     setFlags([]);
     setIndex(0);
@@ -101,7 +97,7 @@ export function Exam({ questions, onSession }: ExamProps) {
     setRemaining(minutes * 60);
     setDeadline(Date.now() + minutes * 60 * 1000);
     setPhase('running');
-  }, [count, minutes, pool, subjectIds]);
+  }, [minutes, pool, subjectIds]);
 
   const finish = useCallback(
     (timedOut: boolean) => {
@@ -174,8 +170,9 @@ export function Exam({ questions, onSession }: ExamProps) {
             <p className="eyebrow">Timed paper</p>
             <h1 className="page-title">Set the paper before the clock</h1>
             <p className="page-note">
-              English is compulsory. Pick one to three other subjects (two to four in total). Questions are drawn
-              at random, and nothing is revealed until you end the paper or time runs out.
+              English is compulsory and carries 60 questions. Pick one to three other subjects (two to four in
+              total); each carries 40 questions. Questions are drawn at random, and nothing is revealed until you
+              end the paper or time runs out.
             </p>
           </header>
 
@@ -184,7 +181,7 @@ export function Exam({ questions, onSession }: ExamProps) {
               <legend className="legend">Subjects</legend>
               <div className="chips">
                 {SUBJECTS.map((subject) => {
-                  const available = questions.filter((question) => question.subject === subject.id).length;
+                  const available = counts.get(subject.id) ?? 0;
                   const active = subjectIds.includes(subject.id);
                   const locked = subject.id === 'english';
                   const blocked = available === 0 || (locked && available > 0) || (!active && atSubjectLimit);
@@ -219,24 +216,15 @@ export function Exam({ questions, onSession }: ExamProps) {
 
             <fieldset className="fieldset">
               <legend className="legend">Questions</legend>
-              <div className="segmented">
-                {COUNT_CHOICES.map((choice) => (
-                  <button
-                    key={choice}
-                    type="button"
-                    className={`segment ${count === choice ? 'is-active' : ''}`}
-                    aria-pressed={count === choice}
-                    onClick={() => setCount(choice)}
-                  >
-                    {choice}
-                  </button>
-                ))}
-              </div>
               <p className="hint">
-                {pool.length === 0
-                  ? 'No questions in the selected subjects yet.'
-                  : `This paper will have ${plural(paperSize, 'question')}.`}
+                English 60 · each other subject 40
+                {paperSize > 0 ? ` · ${plural(paperSize, 'question')} in total.` : '.'}
               </p>
+              {paperSize < fullPaperSize ? (
+                <p className="hint hint-warn">
+                  Some selected subjects do not have the full quota; the paper will use the questions available.
+                </p>
+              ) : null}
             </fieldset>
 
             <fieldset className="fieldset">
