@@ -133,7 +133,8 @@ export function ImportPanel({ bankSize, importedCount, onImport, onClearImported
         <h2 className="subhead">The schema</h2>
         <ul className="schema" role="list">
           <li>
-            <code>subject</code> — one of: english, mathematics, physics, chemistry, biology, government, economics.
+            <code>subject</code> — one of: english, mathematics, physics, chemistry, biology, government, economics,
+            literature.
           </li>
           <li>
             <code>prompt</code> — the question text.

@@ -50,6 +50,12 @@ export const SUBJECTS: Subject[] = [
     short: 'Economics',
     blurb: 'Demand and supply, cost, money and the measures of a national economy.',
   },
+  {
+    id: 'literature',
+    name: 'Literature in English',
+    short: 'Literature',
+    blurb: 'Drama, prose and poetry set texts, plus the literary terms examiners expect.',
+  },
 ];
 
 const INDEX = new Map<SubjectId, Subject>(SUBJECTS.map((subject) => [subject.id, subject]));

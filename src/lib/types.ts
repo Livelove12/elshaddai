@@ -9,7 +9,8 @@ export type SubjectId =
   | 'chemistry'
   | 'biology'
   | 'government'
-  | 'economics';
+  | 'economics'
+  | 'literature';
 
 export interface Question {
   /** Stable identifier. Any string, unique across the bank. */
