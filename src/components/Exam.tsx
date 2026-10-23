@@ -365,9 +365,7 @@ export function Exam({ questions, onSession }: ExamProps) {
                     <summary className="review-summary">
                       <span className={`review-mark ${ok ? 'is-ok' : 'is-no'}`}>{ok ? '✓' : '✗'}</span>
                       <span className="review-count">{position + 1}</span>
-                      <span className="review-topic">
-                        {subjectById(question.subject).short} · {question.topic}
-                      </span>
+                      <span className="review-topic">{subjectById(question.subject).short}</span>
                       <span className="review-given">
                         {given ? `you: ${given}` : 'left blank'} · key: {question.answer}
                       </span>
@@ -436,7 +434,6 @@ export function Exam({ questions, onSession }: ExamProps) {
           <div className="question-meta">
             <span className="pill">Question {index + 1}</span>
             <span className="pill pill-quiet">{subjectById(current.subject).short}</span>
-            <span className="pill pill-quiet">{current.topic}</span>
           </div>
 
           <p className="question-prompt">

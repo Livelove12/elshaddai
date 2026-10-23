@@ -168,7 +168,6 @@ export function Practice({ questions, filter, onFilter }: PracticeProps) {
                 <div className="question-meta">
                   <span className="pill">{subjectById(current.subject).short}</span>
                   <span className="pill pill-quiet">{current.topic}</span>
-                  {current.source ? <span className="question-source">{current.source}</span> : null}
                 </div>
 
                 <p className="question-prompt">

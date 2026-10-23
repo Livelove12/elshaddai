@@ -49,7 +49,7 @@ export function Home({ questions, sessions, onPickSubject, onStartExam, onOpenPr
             <figure className="hero-panel">
               <figcaption className="panel-caption">
                 <span className="panel-tag">Sample</span>
-                {subjectById(sample.subject).short} · {sample.topic}
+                {subjectById(sample.subject).short}
               </figcaption>
               <p className="panel-prompt">
                 <RichText text={sample.prompt} />
