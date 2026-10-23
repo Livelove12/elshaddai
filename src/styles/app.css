@@ -1210,6 +1210,10 @@ select {
   padding: var(--space-6);
 }
 
+.coverage-table {
+  margin-block: var(--space-4) var(--space-8);
+}
+
 .fieldset {
   display: grid;
   gap: var(--space-3);

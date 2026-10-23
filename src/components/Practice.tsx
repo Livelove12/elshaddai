@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { subjectById, SUBJECTS } from '../data/subjects';
 import { OPTION_KEYS, type OptionKey, type Question, type SubjectId } from '../lib/types';
-import { percent, plural } from '../lib/utils';
+import { percent } from '../lib/utils';
 import { OptionList } from './OptionList';
 import { RichText } from './RichText';
 
@@ -134,7 +134,7 @@ export function Practice({ questions, filter, onFilter }: PracticeProps) {
               aria-pressed={filter === 'all'}
               onClick={() => onFilter('all')}
             >
-              All <span className="chip-count">{questions.length}</span>
+              All
             </button>
             {SUBJECTS.map((subject) => (
               <button
@@ -145,7 +145,7 @@ export function Practice({ questions, filter, onFilter }: PracticeProps) {
                 onClick={() => onFilter(subject.id)}
                 disabled={(counts.get(subject.id) ?? 0) === 0}
               >
-                {subject.short} <span className="chip-count">{counts.get(subject.id) ?? 0}</span>
+                {subject.short}
               </button>
             ))}
           </div>
@@ -220,28 +220,9 @@ export function Practice({ questions, filter, onFilter }: PracticeProps) {
 
             <aside className="reader-side">
               <div className="side-card">
-                <h2 className="side-title">In this set</h2>
-                <p className="side-big">
-                  {index + 1}
-                  <span className="side-of">/ {filtered.length}</span>
-                </p>
-                <ol className="marker-list" role="list">
-                  {filtered.slice(0, 40).map((question, position) => (
-                    <li key={question.id}>
-                      <button
-                        type="button"
-                        className={`marker ${position === index ? 'is-current' : ''}`}
-                        onClick={() => setIndex(position)}
-                        title={question.topic}
-                      >
-                        {position + 1}
-                      </button>
-                    </li>
-                  ))}
-                </ol>
-                {filtered.length > 40 ? (
-                  <p className="side-note">{plural(filtered.length - 40, 'more question')} after these.</p>
-                ) : null}
+                <h2 className="side-title">Current question</h2>
+                <p className="side-big">Question {index + 1}</p>
+                <p className="side-note">Use Previous and Next to move through the set.</p>
               </div>
 
               <div className="side-card side-card-quiet">

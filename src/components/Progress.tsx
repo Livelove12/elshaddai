@@ -1,17 +1,16 @@
 import { useMemo, useState } from 'react';
 import { SUBJECTS, subjectById } from '../data/subjects';
-import type { Question, SessionRecord, SubjectId } from '../lib/types';
-import { formatClock, formatDate, percent, plural } from '../lib/utils';
+import type { SessionRecord, SubjectId } from '../lib/types';
+import { formatClock, formatDate, percent } from '../lib/utils';
 import { Modal } from './Modal';
 
 interface ProgressProps {
   sessions: SessionRecord[];
-  questions: Question[];
   onClear: () => void;
   onStartExam: () => void;
 }
 
-export function Progress({ sessions, questions, onClear, onStartExam }: ProgressProps) {
+export function Progress({ sessions, onClear, onStartExam }: ProgressProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const totals = useMemo(() => {
@@ -36,8 +35,6 @@ export function Progress({ sessions, questions, onClear, onStartExam }: Progress
     return map;
   }, [sessions]);
 
-  const imported = questions.length;
-
   if (sessions.length === 0) {
     return (
       <section className="section">
@@ -47,7 +44,7 @@ export function Progress({ sessions, questions, onClear, onStartExam }: Progress
             <h1 className="page-title">Nothing recorded yet</h1>
             <p className="page-note">
               Papers you sit are stored in this browser — never uploaded. Finish one and this page fills with your
-              scores by subject, {plural(imported, 'question')} currently in the bank.
+              scores by subject.
             </p>
           </header>
           <button type="button" className="btn btn-primary" onClick={onStartExam}>

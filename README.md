@@ -23,11 +23,11 @@ it keeps working offline and can be added to a phone's home screen.
 
 | Screen | What it does |
 | --- | --- |
-| Home | Live counts from the bank, subject cards, and a recap of recent papers |
+| Home | Subject cards, a sample question, and a recap of recent papers — no bank totals |
 | Practice | One question at a time, filters by subject, search across prompts, explanation on reveal, keyboard shortcuts (A–D / 1–4, ← →) |
 | Timed paper | English compulsory plus one to three other subjects (two to four total), custom time limit up to two hours, countdown clock, question palette, flag-for-review, auto-end at zero, results with a per-subject breakdown and a full review only after the exam ends |
 | Progress | Papers sat, overall accuracy, best paper, accuracy by subject, paper log |
-| Import | Paste or upload JSON to extend the bank |
+| Import | Paste or upload JSON to extend the bank; the owner-only **Bank coverage** table shows per-subject counts |
 
 ## The question bank
 
@@ -59,7 +59,11 @@ directly. Both use the same shape:
 Rules:
 
 - `subject` must be one of `english`, `mathematics`, `physics`, `chemistry`,
-  `biology`, `government`, `economics`. Add more in `src/data/subjects.ts`.
+  `biology`, `government`, `economics`, `literature`. Add more in
+  `src/data/subjects.ts`.
+- Student screens never show per-subject bank counts. The **Import** screen is
+  the owner's coverage view, and imported question text stays in this browser's
+  `localStorage` unless you deliberately publish it.
 - `options` must carry all four keys `A`, `B`, `C`, `D`; `answer` must be one of
   them.
 - `prompt` and `explanation` are required. `id`, `topic`, `source` and `year` are

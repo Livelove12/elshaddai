@@ -198,7 +198,7 @@ export function Exam({ questions, onSession }: ExamProps) {
                       disabled={blocked}
                       onClick={() => toggleSubject(subject.id)}
                     >
-                      {subject.short} <span className="chip-count">{available}</span>
+                      {subject.short}
                       {locked ? <span className="chip-lock">Required</span> : null}
                     </button>
                   );
@@ -235,7 +235,7 @@ export function Exam({ questions, onSession }: ExamProps) {
               <p className="hint">
                 {pool.length === 0
                   ? 'No questions in the selected subjects yet.'
-                  : `This paper will have ${plural(paperSize, 'question')} — the pool holds ${pool.length}.`}
+                  : `This paper will have ${plural(paperSize, 'question')}.`}
               </p>
             </fieldset>
 
@@ -270,7 +270,7 @@ export function Exam({ questions, onSession }: ExamProps) {
                 Start the clock
               </button>
               <p className="setup-meta">
-                {subjectIds.length} subjects · {plural(paperSize, 'question')} · {minutes} minutes
+                {plural(subjectIds.length, 'subject')} · {plural(paperSize, 'question')} · {minutes} minutes
               </p>
             </div>
           </div>

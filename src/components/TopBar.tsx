@@ -9,11 +9,10 @@ const NAV: { view: Exclude<View, 'home'>; label: string; short: string }[] = [
 
 interface TopBarProps {
   view: View;
-  bankSize: number;
   onNavigate: (view: View) => void;
 }
 
-export function TopBar({ view, bankSize, onNavigate }: TopBarProps) {
+export function TopBar({ view, onNavigate }: TopBarProps) {
   const link = (item: (typeof NAV)[number], extraClass = '') => (
     <a
       key={item.view}
@@ -63,7 +62,7 @@ export function TopBar({ view, bankSize, onNavigate }: TopBarProps) {
 
           <p className="topbar-meta">
             <span className="meta-dot" aria-hidden="true" />
-            {bankSize} questions on this device
+            Private bank on this device
           </p>
         </div>
       </header>

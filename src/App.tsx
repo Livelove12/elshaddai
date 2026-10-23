@@ -86,7 +86,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <TopBar view={view} bankSize={questions.length} onNavigate={go} />
+      <TopBar view={view} onNavigate={go} />
 
       <main id="main" className="main">
         {view === 'home' ? (
@@ -104,17 +104,12 @@ export default function App() {
         {view === 'exam' ? <Exam questions={questions} onSession={addSession} /> : null}
 
         {view === 'progress' ? (
-          <Progress
-            sessions={sessions}
-            questions={questions}
-            onClear={clearAll}
-            onStartExam={() => go('exam')}
-          />
+          <Progress sessions={sessions} onClear={clearAll} onStartExam={() => go('exam')} />
         ) : null}
 
         {view === 'import' ? (
           <ImportPanel
-            bankSize={questions.length}
+            questions={questions}
             importedCount={custom.length}
             onImport={importQuestions}
             onClearImported={clearImported}

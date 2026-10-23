@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { SUBJECTS, subjectById } from '../data/subjects';
 import type { Question, SessionRecord, SubjectId } from '../lib/types';
-import { formatDate, percent, plural } from '../lib/utils';
+import { formatDate, percent } from '../lib/utils';
 import { OptionList } from './OptionList';
 import { RichText } from './RichText';
 
@@ -20,7 +20,6 @@ export function Home({ questions, sessions, onPickSubject, onStartExam, onOpenPr
     return map;
   }, [questions]);
 
-  const topicCount = useMemo(() => new Set(questions.map((q) => `${q.subject}/${q.topic}`)).size, [questions]);
   const sample = questions.find((question) => question.subject === 'english') ?? questions[0];
   const lastSession = sessions[0];
 
@@ -43,10 +42,7 @@ export function Home({ questions, sessions, onPickSubject, onStartExam, onOpenPr
                 Open the question bank
               </button>
             </div>
-            <p className="hero-note">
-              {plural(questions.length, 'question')} · {plural(topicCount, 'topic')} · {plural(SUBJECTS.length, 'subject')} ·
-              stored in this browser
-            </p>
+            <p className="hero-note">Private question bank · stored in this browser · works offline</p>
           </div>
 
           {sample ? (
@@ -71,10 +67,7 @@ export function Home({ questions, sessions, onPickSubject, onStartExam, onOpenPr
         <div className="wrap">
           <div className="section-head">
             <h2>Where the marks are</h2>
-            <p className="section-note">
-              Pick a subject to open it in practice mode. Counts below are live from the bank on this device — no
-              invented figures.
-            </p>
+            <p className="section-note">Pick a subject to open it in practice mode.</p>
           </div>
 
           <ul className="subject-grid" role="list">
@@ -91,7 +84,7 @@ export function Home({ questions, sessions, onPickSubject, onStartExam, onOpenPr
                     <span className="subject-name">{subject.name}</span>
                     <span className="subject-blurb">{subject.blurb}</span>
                     <span className="subject-foot">
-                      <span className="subject-count">{count === 0 ? 'no items yet' : plural(count, 'question')}</span>
+                      <span className="subject-count">Practice</span>
                       <span className="subject-arrow" aria-hidden="true">
                         →
                       </span>

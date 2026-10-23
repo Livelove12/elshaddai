@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
+import { SUBJECTS } from '../data/subjects';
 import { parseQuestions } from '../lib/importQuestions';
 import type { Question } from '../lib/types';
 import { plural } from '../lib/utils';
 
 interface ImportPanelProps {
-  bankSize: number;
+  questions: Question[];
   importedCount: number;
   onImport: (questions: Question[]) => void;
   onClearImported: () => void;
@@ -31,11 +32,15 @@ const TEMPLATE = `{
   ]
 }`;
 
-export function ImportPanel({ bankSize, importedCount, onImport, onClearImported }: ImportPanelProps) {
+export function ImportPanel({ questions, importedCount, onImport, onClearImported }: ImportPanelProps) {
   const [text, setText] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const counts = SUBJECTS.map((subject) => ({
+    ...subject,
+    count: questions.filter((question) => question.subject === subject.id).length,
+  }));
 
   const runImport = () => {
     const { questions, errors: problems } = parseQuestions(text);
@@ -57,11 +62,37 @@ export function ImportPanel({ bankSize, importedCount, onImport, onClearImported
           <p className="eyebrow">Import</p>
           <h1 className="page-title">Bring your own questions</h1>
           <p className="page-note">
-            The seed bank holds {plural(bankSize - importedCount, 'original practice item')}. Paste or upload a JSON file
-            of your own material — notes, a licensed pack, a class set — and it joins the same bank, practice filters
-            and timed papers.
+            The seed bank holds {plural(questions.length - importedCount, 'original practice item')}. Paste or upload a
+            JSON file of your own material — notes, a licensed pack, a class set — and it joins the same bank, practice
+            filters and timed papers.
           </p>
         </header>
+
+        <h2 className="subhead">Bank coverage</h2>
+        <p className="section-note">
+          Question counts are shown here only, so students do not see them. Aim for at least 100 per subject.
+        </p>
+        <table className="table coverage-table">
+          <thead>
+            <tr>
+              <th scope="col">Subject</th>
+              <th scope="col">Questions</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {counts.map((subject) => {
+              const short = Math.max(0, 100 - subject.count);
+              return (
+                <tr key={subject.id}>
+                  <th scope="row">{subject.name}</th>
+                  <td className="num">{subject.count}</td>
+                  <td>{short === 0 ? <span className="hint-ok">100+ ready</span> : <span className="hint-warn">{short} short</span>}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
 
         <div className="card setup">
           <div className="fieldset">
