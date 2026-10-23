@@ -1,0 +1,19 @@
+{
+  "name": "Elshaddai — JAMB CBT practice",
+  "short_name": "Elshaddai",
+  "description": "Untimed topic practice and timed CBT papers, with an explanation for every answer.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#faf6ec",
+  "theme_color": "#faf6ec",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

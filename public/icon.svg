@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Elshaddai">
+  <rect width="64" height="64" rx="12" fill="#0f3d2e"/>
+  <path d="M18 33.5l9.5 9L46 21" fill="none" stroke="#f7f2e4" stroke-width="6.5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <rect x="43" y="43" width="9" height="9" fill="#c9a227"/>
+</svg>
