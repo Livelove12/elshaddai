@@ -1946,3 +1946,83 @@ select {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Touch & small-screen usability ───────────────────────────────── */
+@media (pointer: coarse), (max-width: 760px) {
+  .btn,
+  .btn-sm {
+    min-height: 44px;
+    padding-block: 10px;
+  }
+
+  .chip {
+    min-height: 40px;
+    padding-inline: 14px;
+    font-size: 0.8125rem;
+  }
+
+  .segment {
+    min-height: 44px;
+    min-width: 52px;
+  }
+
+  .marker {
+    width: 40px;
+    height: 40px;
+    font-size: 12px;
+  }
+
+  .marker-list {
+    gap: 6px;
+  }
+
+  .palette-grid {
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 6px;
+  }
+
+  .palette-cell,
+  .palette-cell:is(*) {
+    min-height: 40px;
+  }
+
+  .brand {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* 16px stops iOS Safari zooming the page when a field is focused */
+  .search input,
+  .code-input {
+    font-size: 16px;
+  }
+
+  .search {
+    display: block;
+    width: 100%;
+  }
+
+  .search input {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .file-btn input {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .app {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+
+  .tabbar a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    font-size: 11px;
+  }
+}
