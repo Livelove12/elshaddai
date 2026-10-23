@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { SUBJECTS, subjectById } from '../data/subjects';
+import { sessionMaxScore, sessionScore } from '../lib/scoring';
 import type { SessionRecord, SubjectId } from '../lib/types';
 import { formatClock, formatDate, percent } from '../lib/utils';
 import { Modal } from './Modal';
@@ -16,7 +17,15 @@ export function Progress({ sessions, onClear, onStartExam }: ProgressProps) {
   const totals = useMemo(() => {
     const answered = sessions.reduce((sum, session) => sum + session.total, 0);
     const correct = sessions.reduce((sum, session) => sum + session.correct, 0);
-    const best = sessions.reduce((max, session) => Math.max(max, percent(session.correct, session.total)), 0);
+    const best = sessions.reduce(
+      (best, session) => {
+        const score = sessionScore(session);
+        const max = sessionMaxScore(session);
+        const share = percent(score, max);
+        return share > best.share ? { score, max, share } : best;
+      },
+      { score: 0, max: 0, share: -1 },
+    );
     const time = sessions.reduce((sum, session) => sum + session.usedSec, 0);
     return { answered, correct, best, time };
   }, [sessions]);
@@ -82,8 +91,10 @@ export function Progress({ sessions, onClear, onStartExam }: ProgressProps) {
             <p className="tile-value">{percent(totals.correct, totals.answered)}%</p>
           </div>
           <div className="tile">
-            <p className="tile-label">Best paper</p>
-            <p className="tile-value">{totals.best}%</p>
+            <p className="tile-label">Best JAMB score</p>
+            <p className="tile-value">
+              {totals.best.max > 0 ? `${totals.best.score}/${totals.best.max}` : '—'}
+            </p>
           </div>
           <div className="tile">
             <p className="tile-label">Time under the clock</p>
@@ -98,7 +109,7 @@ export function Progress({ sessions, onClear, onStartExam }: ProgressProps) {
               <th scope="col">Subject</th>
               <th scope="col">Correct</th>
               <th scope="col">Seen</th>
-              <th scope="col">Percent</th>
+              <th scope="col">Score</th>
               <th scope="col" aria-hidden="true" />
             </tr>
           </thead>
@@ -111,7 +122,7 @@ export function Progress({ sessions, onClear, onStartExam }: ProgressProps) {
                   <th scope="row">{subject.name}</th>
                   <td className="num">{bucket ? bucket.correct : '—'}</td>
                   <td className="num">{bucket ? bucket.total : '—'}</td>
-                  <td className="num">{bucket ? `${share}%` : '—'}</td>
+                  <td className="num">{bucket ? `${share}/100` : '—'}</td>
                   <td className="bar-cell">
                     <span className="bar">
                       <span style={{ width: `${share}%` }} />
@@ -125,22 +136,26 @@ export function Progress({ sessions, onClear, onStartExam }: ProgressProps) {
 
         <h2 className="subhead">Paper log</h2>
         <ul className="log" role="list">
-          {sessions.map((session) => (
-            <li key={session.id} className="log-row">
-              <span className="log-date">{formatDate(session.createdAt)}</span>
-              <span className="log-subjects">
-                {session.subjectIds.length > 2
-                  ? `${session.subjectIds.length} subjects`
-                  : session.subjectIds.map((id) => subjectById(id).short).join(', ')}
-              </span>
-              <span className="log-score">
-                {session.correct}/{session.total} · {percent(session.correct, session.total)}%
-              </span>
-              <span className="log-time">
-                {formatClock(session.usedSec)} of {formatClock(session.durationSec)}
-              </span>
-            </li>
-          ))}
+          {sessions.map((session) => {
+            const score = sessionScore(session);
+            const max = sessionMaxScore(session);
+            return (
+              <li key={session.id} className="log-row">
+                <span className="log-date">{formatDate(session.createdAt)}</span>
+                <span className="log-subjects">
+                  {session.subjectIds.length > 2
+                    ? `${session.subjectIds.length} subjects`
+                    : session.subjectIds.map((id) => subjectById(id).short).join(', ')}
+                </span>
+                <span className="log-score">
+                  {score}/{max} · {percent(score, max)}%
+                </span>
+                <span className="log-time">
+                  {formatClock(session.usedSec)} of {formatClock(session.durationSec)}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </div>
 

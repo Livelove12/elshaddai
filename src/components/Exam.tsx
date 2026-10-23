@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SUBJECTS, subjectById } from '../data/subjects';
+import {
+  ENGLISH_QUESTIONS,
+  OTHER_QUESTIONS,
+  quotaFor,
+  sessionMaxScore,
+  sessionScore,
+  subjectScore,
+} from '../lib/scoring';
 import type { OptionKey, Question, SessionRecord, SubjectId } from '../lib/types';
 import { formatClock, newId, percent, plural, shuffle } from '../lib/utils';
 import { Modal } from './Modal';
@@ -12,15 +20,9 @@ interface Outcome extends SessionRecord {
   timedOut: boolean;
 }
 
-const ENGLISH_QUESTIONS = 60;
-const OTHER_QUESTIONS = 40;
 const MIN_SUBJECTS = 2;
 const MAX_SUBJECTS = 4;
 const MAX_MINUTES = 120;
-
-function quotaFor(id: SubjectId): number {
-  return id === 'english' ? ENGLISH_QUESTIONS : OTHER_QUESTIONS;
-}
 
 function clampMinutes(raw: string): number {
   if (!raw.trim()) return MAX_MINUTES;
@@ -172,7 +174,8 @@ export function Exam({ questions, onSession }: ExamProps) {
             <p className="page-note">
               English is compulsory and carries 60 questions. Pick one to three other subjects (two to four in
               total); each carries 40 questions. Questions are drawn at random, and nothing is revealed until you
-              end the paper or time runs out.
+              end the paper or time runs out. Each subject is scored over 100, so a four-subject paper is out of
+              400.
             </p>
           </header>
 
@@ -270,6 +273,9 @@ export function Exam({ questions, onSession }: ExamProps) {
   /* ── Results ───────────────────────────────────────────────────────── */
   if (phase === 'done' && outcome) {
     const breakdown = Object.entries(outcome.bySubject).filter(([, value]) => value && value.total > 0);
+    const score = sessionScore(outcome);
+    const maxScore = sessionMaxScore(outcome);
+    const scorePercent = percent(score, maxScore);
 
     return (
       <section className="section">
@@ -281,17 +287,18 @@ export function Exam({ questions, onSession }: ExamProps) {
 
           <div className="score-board card">
             <p className="score-figure">
-              {outcome.correct}
-              <span className="score-of">/ {outcome.total}</span>
+              {score}
+              <span className="score-of">/ {maxScore}</span>
             </p>
             <div className="score-meta">
-              <p className="score-percent">{percent(outcome.correct, outcome.total)}%</p>
+              <p className="score-percent">{scorePercent}%</p>
               <p className="score-detail">
-                Time used {formatClock(outcome.usedSec)} of {formatClock(outcome.durationSec)} · {answeredCount} of{' '}
+                JAMB score · raw {outcome.correct}/{outcome.total} correct · time used{' '}
+                {formatClock(outcome.usedSec)} of {formatClock(outcome.durationSec)} · {answeredCount} of{' '}
                 {outcome.total} answered
               </p>
               <div className="score-bar" aria-hidden="true">
-                <span style={{ width: `${percent(outcome.correct, outcome.total)}%` }} />
+                <span style={{ width: `${scorePercent}%` }} />
               </div>
             </div>
             <div className="score-actions">
@@ -317,23 +324,23 @@ export function Exam({ questions, onSession }: ExamProps) {
               <tr>
                 <th scope="col">Subject</th>
                 <th scope="col">Score</th>
-                <th scope="col">Percent</th>
+                <th scope="col">Correct</th>
                 <th scope="col" aria-hidden="true" />
               </tr>
             </thead>
             <tbody>
               {breakdown.map(([id, value]) => {
-                const share = percent(value!.correct, value!.total);
+                const subjectResult = subjectScore(value!.correct, value!.total);
                 return (
                   <tr key={id}>
                     <th scope="row">{subjectById(id as SubjectId).name}</th>
+                    <td className="num">{subjectResult}/100</td>
                     <td className="num">
                       {value!.correct}/{value!.total}
                     </td>
-                    <td className="num">{share}%</td>
                     <td className="bar-cell">
                       <span className="bar">
-                        <span style={{ width: `${share}%` }} />
+                        <span style={{ width: `${subjectResult}%` }} />
                       </span>
                     </td>
                   </tr>

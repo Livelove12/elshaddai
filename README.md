@@ -25,7 +25,7 @@ it keeps working offline and can be added to a phone's home screen.
 | --- | --- |
 | Home | Subject cards, a sample question, and a recap of recent papers — no bank totals |
 | Practice | One question at a time, filters by subject, search across prompts, explanation on reveal, keyboard shortcuts (A–D / 1–4, ← →) |
-| Timed paper | English compulsory (60 questions) plus one to three other subjects (40 questions each), custom time limit up to two hours, countdown clock, question palette, flag-for-review, auto-end at zero, results with a per-subject breakdown and a full review only after the exam ends |
+| Timed paper | English compulsory (60 questions) plus one to three other subjects (40 questions each), custom time limit up to two hours, countdown clock, question palette, flag-for-review, auto-end at zero, JAMB-style score out of 100 per subject (400 for four subjects), per-subject breakdown, and a full review only after the exam ends |
 | Progress | Papers sat, overall accuracy, best paper, accuracy by subject, paper log |
 | Import | Paste or upload JSON to extend the bank; the owner-only **Bank coverage** table shows per-subject counts |
 
