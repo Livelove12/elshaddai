@@ -1,5 +1,5 @@
 /* Elshaddai service worker — runtime cache, offline after first visit. */
-const CACHE = 'elshaddai-v1';
+const CACHE = 'elshaddai-v2';
 const PRECACHE = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (event) => {

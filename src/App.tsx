@@ -6,12 +6,14 @@ import { ImportPanel } from './components/ImportPanel';
 import { Practice } from './components/Practice';
 import { Progress } from './components/Progress';
 import { TopBar } from './components/TopBar';
+import { BUNDLED_QUESTIONS } from './data/bank';
 import { SEED_QUESTIONS } from './data/questions';
 import { mergeQuestions } from './lib/importQuestions';
 import { store } from './lib/storage';
 import type { Question, SessionRecord, SubjectId, View } from './lib/types';
 
 const VIEWS: View[] = ['home', 'practice', 'exam', 'progress', 'import'];
+const BASE_QUESTIONS = mergeQuestions(SEED_QUESTIONS, BUNDLED_QUESTIONS);
 
 function viewFromHash(): View {
   if (typeof window === 'undefined') return 'home';
@@ -35,7 +37,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, [view]);
 
-  const questions = useMemo(() => mergeQuestions(SEED_QUESTIONS, custom), [custom]);
+  const questions = useMemo(() => mergeQuestions(BASE_QUESTIONS, custom), [custom]);
 
   const go = useCallback((next: View) => {
     const hash = next === 'home' ? '#/' : `#/${next}`;

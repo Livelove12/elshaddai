@@ -55,7 +55,7 @@ export function TopBar({ view, onNavigate }: TopBarProps) {
 
           <p className="topbar-meta">
             <span className="meta-dot" aria-hidden="true" />
-            Private bank on this device
+            Full bank · works offline
           </p>
         </div>
       </header>

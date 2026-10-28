@@ -3,15 +3,15 @@ export function Footer() {
     <footer className="footer">
       <div className="wrap footer-inner">
         <p className="footer-statement">
-          Elshaddai is a self-contained practice room. Nothing is uploaded: your answers, papers and imported questions
-          live in this browser only.
+          Elshaddai is a self-contained practice room. Nothing is uploaded: your answers, papers and extra imports live
+          in this browser only.
         </p>
         <div className="footer-cols">
           <div>
             <h3>Content</h3>
             <p>
-              The seed bank ships with original practice items written for this app, labelled as such. Import your own
-              licensed material to extend it.
+              The app ships with a full practice bank across eight subjects. Import your own licensed material to
+              extend it; extra imports stay in this browser.
             </p>
           </div>
           <div>

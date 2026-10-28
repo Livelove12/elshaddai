@@ -168,8 +168,8 @@ export function Progress({ sessions, onClear, onStartExam }: ProgressProps) {
         onClose={() => setConfirmOpen(false)}
       >
         <p>
-          Your imported questions, paper log and accuracy figures will be removed from this browser. This cannot be
-          undone.
+          Your extra imported questions, paper log and accuracy figures will be removed from this browser. This cannot
+          be undone.
         </p>
       </Modal>
     </section>

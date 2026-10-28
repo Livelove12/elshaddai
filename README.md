@@ -26,17 +26,18 @@ it keeps working offline and can be added to a phone's home screen.
 | Home | Subject cards, a sample question, and a recap of recent papers — no bank totals |
 | Practice | One question at a time, filters by subject, search across prompts, explanation on reveal, keyboard shortcuts (A–D / 1–4, ← →) |
 | Timed paper | English compulsory (60 questions) plus one to three other subjects (40 questions each), custom time limit up to two hours, countdown clock, question palette, flag-for-review, auto-end at zero, JAMB-style score out of 100 per subject (400 for four subjects), per-subject breakdown, and a full review only after the exam ends |
-| Progress | Papers sat, overall accuracy, best paper, accuracy by subject, paper log |
-| Import | Paste or upload JSON to extend the bank; the owner-only **Bank coverage** table shows per-subject counts |
+| Progress | Papers sat, overall accuracy, best JAMB score, score by subject, paper log |
+| Import | Paste or upload JSON to add more questions; the **Bank coverage** table shows per-subject counts |
 
 ## The question bank
 
-`src/data/questions.ts` ships with **original practice items written for this
-app**. They are labelled *Original practice set* in the UI and are not
-transcribed from any publisher's paper.
+`src/data/bank.json` ships the full built-in bank across all eight subjects.
+`src/data/questions.ts` holds the original seed items. Both are loaded for every
+visitor, so no import step is needed to sit a full paper.
 
-Adding your own material: use the **Import** screen, or edit the seed file
-directly. Both use the same shape:
+Extra material: use the **Import** screen. It joins the same bank, practice
+filters and timed papers, and stays in that browser's `localStorage`. The JSON
+shape is the same for the built-in bank and extra imports:
 
 ```json
 {
@@ -62,8 +63,8 @@ Rules:
   `biology`, `government`, `economics`, `literature`. Add more in
   `src/data/subjects.ts`.
 - Student screens never show per-subject bank counts. The **Import** screen is
-  the owner's coverage view, and imported question text stays in this browser's
-  `localStorage` unless you deliberately publish it.
+  the coverage view, and extra imported question text stays in that browser's
+  `localStorage`.
 - `options` must carry all four keys `A`, `B`, `C`, `D`; `answer` must be one of
   them.
 - `prompt` and `explanation` are required. `id`, `topic`, `source` and `year` are
@@ -82,8 +83,9 @@ src/
   main.tsx             entry, service-worker registration
   components/          TopBar, Home, Practice, Exam, Progress, ImportPanel,
                        OptionList, Modal, Footer
-  data/                subjects.ts, questions.ts (seed bank)
-  lib/                 types.ts, storage.ts, importQuestions.ts, utils.ts
+  data/                subjects.ts, questions.ts (seed bank), bank.json (full bank),
+                       bank.ts
+  lib/                 types.ts, storage.ts, importQuestions.ts, scoring.ts, utils.ts
   styles/              tokens.css (design tokens), app.css
 public/                sw.js, manifest.webmanifest, icon.svg
 ```

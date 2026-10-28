@@ -42,7 +42,7 @@ export function Home({ questions, sessions, onPickSubject, onStartExam, onOpenPr
                 Open the question bank
               </button>
             </div>
-            <p className="hero-note">Private question bank · stored in this browser · works offline</p>
+            <p className="hero-note">Full question bank · works offline</p>
           </div>
 
           {sample ? (

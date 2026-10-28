@@ -62,9 +62,8 @@ export function ImportPanel({ questions, importedCount, onImport, onClearImporte
           <p className="eyebrow">Import</p>
           <h1 className="page-title">Bring your own questions</h1>
           <p className="page-note">
-            The seed bank holds {plural(questions.length - importedCount, 'original practice item')}. Paste or upload a
-            JSON file of your own material — notes, a licensed pack, a class set — and it joins the same bank, practice
-            filters and timed papers.
+            The full bank is built in. Paste or upload a JSON file of your own material — notes, a licensed pack, a
+            class set — and it joins the same bank, practice filters and timed papers.
           </p>
         </header>
 
@@ -153,10 +152,10 @@ export function ImportPanel({ questions, importedCount, onImport, onClearImporte
 
           <div className="import-foot">
             <p className="hint">
-              Imported questions currently stored on this device: <strong>{importedCount}</strong>.
+              Extra questions imported on this device: <strong>{importedCount}</strong>.
             </p>
             <button type="button" className="btn btn-quiet btn-sm" onClick={onClearImported} disabled={importedCount === 0}>
-              Remove imported questions
+              Remove extra questions
             </button>
           </div>
         </div>
